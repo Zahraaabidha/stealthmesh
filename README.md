@@ -1,118 +1,51 @@
-StealthMesh
-Adaptive Stealth Communication & Decentralized Cyber Defense Framework
+**_*_*Adaptive Stealth Communication & Decentralized Cyber Defense****
 
-Academic Year: AY2025–26
+StealthMesh is a decentralized cybersecurity framework designed for MSMEs.
+It provides stealth communication, distributed anomaly detection, peer alerts, deception routing, and autonomous micro-containment without requiring centralized SOC infrastructure_._
 
-StealthMesh is a decentralized cybersecurity framework designed for MSMEs (Micro, Small & Medium Enterprises) that lack the resources to deploy advanced security systems.
-This project implements stealth networking, anomaly detection, deception routing, and autonomous micro-containment, forming a lightweight but powerful defense system capable of resisting modern cyber threats.
+🚀 **Objective**
 
-The entire system runs with local Python processes (no containers required) and exposes a FastAPI-based dashboard backend to monitor alerts, nodes, and containment actions.
+Build a lightweight, affordable, and resilient cyber-defense mesh where each node:
 
-🚨 Problem
+Communicates through encrypted, stealth-enabled channels
 
-Modern attacks such as reconnaissance scans, brute-force intrusions, and lateral movement overwhelm small industries that do not have:
+Detects anomalies locally
 
-A centralized Security Operations Center (SOC)
+Shares alerts with peers
 
-Moving Target Defense (MTD) systems
+Executes deception and micro-containment actions
 
-Enterprise-grade detection tools
+Reports status to a FastAPI dashboard backend
+**
+**Core Components
+Mesh Core (mesh_core/)****
 
-This results in high vulnerability across the supply chain.
+Encrypted node-to-node communication
 
-🎯 Objective
+Key rotation, padding, timing jitter, cover traffic
 
-To build a plug-and-play, decentralized cyber-defense mesh that provides:
+Basic routing abstraction (direct communication)
+****
+**Defense Engine (defense_engine/)******
 
-End-to-end encrypted communication between nodes
+Local detection (rules + optional ML)
 
-Stealth traffic (polymorphic keys, padding, jitter, cover messages)
+Alert broadcasting
 
-Local rule-based and optional ML-based anomaly detection
+Containment logic (local + network-wide)
 
-Peer-to-peer alert sharing
+Deception routing to decoy services
 
-Autonomous micro-containment (quarantine decisions)
+**Dashboard (dashboard/backend/)**
 
-Decoy routing for attacker deception
+FastAPI backend for:
 
-A FastAPI-powered dashboard for visibility
+Node status
 
-All without specialized hardware, containers, or complex infrastructure.
+Alerts
 
-🧩 System Architecture (Based on Phases 1–7)
-Phase 1 – Architecture, Configuration & Setup
+Containment actions
 
-Project structure with separate modules
+**Simulations (simulations/)**
 
-YAML-based node configuration files
-
-Documentation of architecture and threat model
-
-Phase 2 – Mesh Communication Core
-
-Python socket / asyncio based node-to-node communication
-
-AES-GCM / ChaCha20 encryption via cryptography
-
-Basic routing abstraction for direct and future multi-hop communication
-
-Multi-node operation using multiple terminals (no Docker)
-
-Phase 3 – Stealth Layer
-
-Dynamic key rotation (“polymorphic encryption”)
-
-Random packet padding
-
-Timing jitter to obfuscate traffic patterns
-
-Cover/decoy traffic generator
-
-Phase 4 – Detection & Peer Alerts
-
-Local anomaly detection rules
-
-Optional ML (Isolation Forest) for anomaly scoring
-
-Alert broadcasting to peers via the mesh
-
-Phase 5 – Deception & Micro-Containment
-
-Local containment logic
-
-Network-wide collaborative quarantine
-
-Simple decoy/redirect services for attacker misdirection
-
-Simulated firewall behavior implemented directly in Python
-
-Phase 6 – Dashboard Backend
-
-Built using FastAPI
-
-Endpoints:
-
-/nodes – Node statuses
-
-/alerts – Distributed alerts
-
-/actions – Containment/deception actions
-
-Node agents periodically POST updates to the dashboard
-
-Phase 7 – Attack Simulations & Evaluation
-
-Port-scan simulators
-
-Brute-force attempt generators
-
-Lateral movement simulators
-
-Evaluation metrics:
-
-Detection latency
-
-Containment time
-
-False positive/negative rates
+Port scans, brute-force attempts, lateral movement tests
