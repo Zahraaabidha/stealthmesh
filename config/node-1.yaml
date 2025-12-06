@@ -1,0 +1,9 @@
+node_id: "node-1"
+listen_host: "127.0.0.1"
+listen_port: 9001
+peers:
+  - { node_id: "node-2", host: "127.0.0.1", port: 9002 }
+  - { node_id: "node-3", host: "127.0.0.1", port: 9003 }
+keys:
+  private_key_path: "keys/mesh_shared.key"
+  public_key_path: "keys/mesh_shared.pub"

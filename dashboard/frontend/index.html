@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StealthMesh Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg: #050816;
+      --card-bg: #0f172a;
+      --card-border: #1f2937;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f87171;
+      --warning: #facc15;
+      --ok: #4ade80;
+      --chip-bg: #111827;
+      --chip-border: #1f2937;
+      --scrollbar-track: #020617;
+      --scrollbar-thumb: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 32px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title h1 span.badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--accent);
+    }
+
+    .title p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    button.refresh-btn {
+      border-radius: 999px;
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      background: var(--chip-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+    }
+
+    button.refresh-btn:hover {
+      background: #020617;
+      border-color: var(--accent);
+      transform: translateY(-0.5px);
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid var(--chip-border);
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.09), transparent 60%),
+                  linear-gradient(to bottom right, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      padding: 14px 14px 10px;
+      box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.75),
+        0 0 0 1px rgba(15,23,42,0.8);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      font-size: 0.95rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #cbd5f5;
+    }
+
+    .card-header h2 span.accent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(56,189,248,0.8);
+    }
+
+    .card-header small {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .node-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .node-item {
+      padding: 10px 10px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(31,41,55,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .node-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .node-id {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .node-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .node-badges {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 0.75rem;
+    }
+
+    .status-chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--chip-border);
+      background: var(--chip-bg);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+    }
+
+    .status-normal { color: var(--ok); }
+    .status-normal .status-dot { background: var(--ok); }
+
+    .status-attack { color: var(--danger); }
+    .status-attack .status-dot { background: var(--danger); }
+
+    .status-quarantine { color: var(--warning); }
+    .status-quarantine .status-dot { background: var(--warning); }
+
+    .status-unknown { color: var(--text-muted); }
+    .status-unknown .status-dot { background: var(--text-muted); }
+
+    .chip-small {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--chip-border);
+      background: #020617;
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scroll-area {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .empty-state {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 6px 2px 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: rgba(15,23,42,0.98);
+      backdrop-filter: blur(4px);
+      z-index: 1;
+    }
+
+    th, td {
+      padding: 6px 6px;
+      text-align: left;
+      border-bottom: 1px solid rgba(31,41,55,0.7);
+    }
+
+    th {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    tbody tr:hover {
+      background: rgba(15,23,42,0.9);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.75rem;
+      background: rgba(15,23,42,0.9);
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid rgba(31,41,55,0.8);
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 0 2px;
+    }
+
+    footer span.accent {
+      color: var(--accent);
+    }
+
+    .last-updated {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>
+          StealthMesh
+          <span class="badge">Decentralized Defense View</span>
+        </h1>
+        <p>Live view of nodes, alerts, and containment / deception actions.</p>
+      </div>
+
+      <div class="controls">
+        <button class="refresh-btn" id="refreshButton">
+          <span>⟳</span>
+          <span>Refresh now</span>
+        </button>
+        <div class="pill">
+          <span class="pill-dot"></span>
+          <span id="autoRefreshLabel">Auto-refresh: 3s</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Left: nodes status -->
+      <section class="card">
+        <div class="card-header">
+          <h2>
+            <span class="accent-dot"></span>
+            Nodes
+          </h2>
+          <small id="nodesSummary">–</small>
+        </div>
+        <div class="card-body">
+          <div id="nodesContainer" class="node-list">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: alerts + actions -->
+      <section class="card">
+        <div class="card-header">
+          <h2>
+            <span class="accent-dot"></span>
+            Alerts & Actions
+          </h2>
+          <small id="alertsSummary">–</small>
+        </div>
+        <div class="card-body">
+          <div class="scroll-area" id="alertsActionsContainer">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        <span class="accent">Legend:</span>
+        <span style="margin-left:6px;">🟢 Normal</span>
+        <span style="margin-left:6px;">🟡 Quarantine</span>
+        <span style="margin-left:6px;">🔴 Under attack</span>
+      </div>
+      <div class="last-updated" id="lastUpdated">Last updated: –</div>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    const REFRESH_INTERVAL_MS = 3000;
+
+    const nodesContainer = document.getElementById("nodesContainer");
+    const alertsActionsContainer = document.getElementById("alertsActionsContainer");
+    const nodesSummary = document.getElementById("nodesSummary");
+    const alertsSummary = document.getElementById("alertsSummary");
+    const lastUpdatedEl = document.getElementById("lastUpdated");
+
+    async function fetchJSON(path) {
+      const res = await fetch(`${API_BASE}${path}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} for ${path}`);
+      }
+      return res.json();
+    }
+
+    function formatTime(ts) {
+      if (!ts) return "–";
+      const d = new Date(ts * 1000);
+      return d.toLocaleTimeString();
+    }
+
+    function renderNodes(nodes) {
+      nodesContainer.innerHTML = "";
+
+      if (!nodes || nodes.length === 0) {
+        nodesContainer.innerHTML = '<div class="empty-state">No nodes have reported yet.</div>';
+        nodesSummary.textContent = "No nodes";
+        return;
+      }
+
+      let underAttack = 0;
+      let quarantine = 0;
+
+      nodes.forEach(node => {
+        if (node.state === "UNDER_ATTACK") underAttack++;
+        if (node.state === "QUARANTINE") quarantine++;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "node-item";
+
+        const main = document.createElement("div");
+        main.className = "node-main";
+        const idEl = document.createElement("div");
+        idEl.className = "node-id";
+        idEl.textContent = node.node_id;
+        const metaEl = document.createElement("div");
+        metaEl.className = "node-meta";
+        metaEl.textContent = `Last seen: ${formatTime(node.last_seen)}`;
+
+        main.appendChild(idEl);
+        main.appendChild(metaEl);
+
+        const badges = document.createElement("div");
+        badges.className = "node-badges";
+
+        // status chip
+        const statusChip = document.createElement("div");
+        statusChip.className = "status-chip";
+
+        const dot = document.createElement("span");
+        dot.className = "status-dot";
+
+        const label = document.createElement("span");
+
+        switch (node.state) {
+          case "NORMAL":
+            statusChip.classList.add("status-normal");
+            label.textContent = "NORMAL";
+            break;
+          case "UNDER_ATTACK":
+            statusChip.classList.add("status-attack");
+            label.textContent = "UNDER ATTACK";
+            break;
+          case "QUARANTINE":
+            statusChip.classList.add("status-quarantine");
+            label.textContent = "QUARANTINE ACTIVE";
+            break;
+          default:
+            statusChip.classList.add("status-unknown");
+            label.textContent = "UNKNOWN";
+            break;
+        }
+
+        statusChip.appendChild(dot);
+        statusChip.appendChild(label);
+        badges.appendChild(statusChip);
+
+        // you can add more chips later (role, region, etc.)
+        wrapper.appendChild(main);
+        wrapper.appendChild(badges);
+        nodesContainer.appendChild(wrapper);
+      });
+
+      nodesSummary.textContent =
+        `${nodes.length} node(s) • ` +
+        `${underAttack} under attack • ` +
+        `${quarantine} in quarantine`;
+    }
+
+    function renderAlertsAndActions(alerts, actions) {
+      alertsActionsContainer.innerHTML = "";
+
+      const totalAlerts = alerts ? alerts.length : 0;
+      const totalActions = actions ? actions.length : 0;
+      alertsSummary.textContent = `${totalAlerts} alert(s) • ${totalActions} action(s)`;
+
+      if (totalAlerts === 0 && totalActions === 0) {
+        alertsActionsContainer.innerHTML =
+          '<div class="empty-state">No alerts or actions yet. Generate activity from your nodes to see updates.</div>';
+        return;
+      }
+
+      // Build a combined timeline sorted by timestamp
+      const combined = [];
+
+      (alerts || []).forEach(a => {
+        combined.push({
+          kind: "ALERT",
+          timestamp: a.timestamp,
+          node_id: a.node_id,
+          suspect: a.suspect,
+          reason: a.reason,
+          confidence: a.confidence,
+          extra: a.extra || {}
+        });
+      });
+
+      (actions || []).forEach(a => {
+        combined.push({
+          kind: "ACTION",
+          timestamp: a.timestamp,
+          node_id: a.node_id,
+          action: a.action,
+          target: a.target,
+          details: a.details || {}
+        });
+      });
+
+      combined.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Node</th>
+          <th>Details</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      combined.forEach(item => {
+        const tr = document.createElement("tr");
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = formatTime(item.timestamp);
+
+        const tdKind = document.createElement("td");
+        if (item.kind === "ALERT") {
+          tdKind.innerHTML = `<span style="color: var(--danger); font-weight:500;">ALERT</span>`;
+        } else {
+          tdKind.innerHTML = `<span style="color: var(--accent); font-weight:500;">ACTION</span>`;
+        }
+
+        const tdNode = document.createElement("td");
+        tdNode.textContent = item.node_id || "–";
+
+        const tdDetails = document.createElement("td");
+
+        if (item.kind === "ALERT") {
+          const type = item.extra?.type || "ALERT";
+          tdDetails.innerHTML = `
+            <div style="margin-bottom:2px;">
+              <strong>Reason:</strong> ${item.reason || "–"}
+            </div>
+            <div style="margin-bottom:2px;">
+              <strong>Suspect:</strong> <code>${item.suspect || "unknown"}</code>
+              &nbsp;&nbsp; <strong>Type:</strong> <code>${type}</code>
+              &nbsp;&nbsp; <strong>Conf:</strong> ${item.confidence?.toFixed ? item.confidence.toFixed(2) : item.confidence}
+            </div>
+          `;
+          if (type === "PORT_SCAN" && item.extra?.ports) {
+            tdDetails.innerHTML += `
+              <div><strong>Ports:</strong> <code>${item.extra.ports.join(", ")}</code></div>
+            `;
+          }
+        } else if (item.kind === "ACTION") {
+          tdDetails.innerHTML = `
+            <div style="margin-bottom:2px;">
+              <strong>Action:</strong> <code>${item.action}</code>
+            </div>
+            <div style="margin-bottom:2px;">
+              <strong>Target:</strong> <code>${item.target || "–"}</code>
+            </div>
+          `;
+          if (item.details && Object.keys(item.details).length > 0) {
+            tdDetails.innerHTML += `
+              <div><strong>Details:</strong> <code>${JSON.stringify(item.details)}</code></div>
+            `;
+          }
+        }
+
+        tr.appendChild(tdTime);
+        tr.appendChild(tdKind);
+        tr.appendChild(tdNode);
+        tr.appendChild(tdDetails);
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      alertsActionsContainer.appendChild(table);
+    }
+
+    async function refreshAll() {
+      try {
+        const [nodes, alerts, actions] = await Promise.all([
+          fetchJSON("/nodes"),
+          fetchJSON("/alerts?limit=100"),
+          fetchJSON("/actions?limit=100"),
+        ]);
+
+        renderNodes(nodes);
+        renderAlertsAndActions(alerts, actions);
+
+        const now = new Date();
+        lastUpdatedEl.textContent = "Last updated: " + now.toLocaleTimeString();
+      } catch (err) {
+        console.error("Error refreshing dashboard:", err);
+        alertsActionsContainer.innerHTML =
+          '<div class="empty-state">Failed to reach backend. Is FastAPI running on <code>127.0.0.1:8000</code>?</div>';
+      }
+    }
+
+    document.getElementById("refreshButton").addEventListener("click", () => {
+      refreshAll();
+    });
+
+    // Initial load
+    refreshAll();
+    // Auto-refresh
+    setInterval(refreshAll, REFRESH_INTERVAL_MS);
+  </script>
+</body>
+</html>
