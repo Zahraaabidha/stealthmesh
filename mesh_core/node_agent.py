@@ -256,9 +256,9 @@ class NodeAgent:
 
 
     def push_status_loop(self, interval=10):
-        """Periodically send node status to dashboard."""
-        while True:
-           event = {
+      """Periodically send node status to dashboard."""
+    while True:
+        event = {
             "type": "STATUS",
             "node_id": self.node_id,
             "timestamp": time.time(),
@@ -267,11 +267,9 @@ class NodeAgent:
                 "port": self.listen_port
             }
         }
+
         self._send_event_to_dashboard(event)
         time.sleep(interval)
-       
-
-
 
     def _handle_alert(self, alert: dict) -> None:
         """
@@ -407,7 +405,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    agent = NodeAgent(args.config_path)
+    agent = NodeAgent(args.node_id, args.config_path)
 
     if agent.node_id != args.node_id:
         print(f"[WARN] node_id argument ({args.node_id}) != config.node_id ({agent.node_id})")
