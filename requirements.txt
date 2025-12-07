@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic
+requests
+pyyaml
+cryptography
+scikit-learn
+numpy
