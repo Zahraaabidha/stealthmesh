@@ -59,7 +59,7 @@ class NodeAgent:
             rotation_interval_sec=300,)
         
                 # Dashboard backend URL (can later move to config/env)
-        self.dashboard_url: str | None = "http://127.0.0.1:8000/events"
+        self.dashboard_url: str | None = "https://stealthmesh-backend.onrender.com"
 
         
                 # Defense engine: detection + alerts
