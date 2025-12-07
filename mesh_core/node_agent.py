@@ -59,7 +59,7 @@ class NodeAgent:
             rotation_interval_sec=300,)
         
                 # Dashboard backend URL (can later move to config/env)
-        self.dashboard_url: str | None = "https://stealthmesh-backend.onrender.com"
+        self.dashboard_url: str | None = "https://stealthmesh-backend.onrender.com/events"
 
         
                 # Defense engine: detection + alerts
@@ -250,9 +250,27 @@ class NodeAgent:
             return
 
         try:
-            requests.post(self.dashboard_url, json=event, timeout=1.0)
+            requests.post(self.dashboard_url, json=event, timeout=3)
         except Exception as e:
             print(f"[{self.node_id}/Dashboard] Failed to send event: {e}")
+
+
+    def push_status_loop(self, interval=10):
+        """Periodically send node status to dashboard."""
+        while True:
+           event = {
+            "type": "STATUS",
+            "node_id": self.node_id,
+            "timestamp": time.time(),
+            "data": {
+                "peers": list(self.peers_by_id.keys()),
+                "port": self.listen_port
+            }
+        }
+        self._send_event_to_dashboard(event)
+        time.sleep(interval)
+       
+
 
 
     def _handle_alert(self, alert: dict) -> None:
@@ -412,6 +430,15 @@ def main() -> None:
         daemon=True,
     )
     cover_thread.start()
+
+    
+    # Start periodic status updates to dashboard
+    status_thread = threading.Thread(
+    target=agent.push_status_loop,
+    daemon=True
+)
+    status_thread.start()
+
 
     # Optional: send one PING if requested
     if args.send_ping_to:
