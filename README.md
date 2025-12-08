@@ -1,23 +1,18 @@
-StealthMesh
-Adaptive Stealth Communication & Decentralized Cyber Defense for MSMEs
+StealthMesh – Adaptive Stealth Communication & Decentralized Cyber Defense for MSMEs
 
-StealthMesh is a lightweight, decentralized cybersecurity framework built for small and medium enterprises (MSMEs) that cannot afford heavy SOC infrastructure.
-Each node in the mesh autonomously detects threats, communicates stealthily, coordinates with peers, and performs micro-containment without relying on any central command.
+StealthMesh is a lightweight, decentralized cybersecurity framework designed for micro, small, and medium enterprises (MSMEs) that cannot afford large-scale SOC (Security Operations Center) infrastructure.
 
-🚀 Key Goals
+Each node in the mesh autonomously detects threats, communicates through stealth channels, coordinates with peers, and performs micro-containment — all without any central command.
 
-Build a resilient, distributed cyber-defense mesh that functions even during partial network compromise.
+The goal is not to replace enterprise SOCs, but to provide a resilient, affordable, and distributed defense system that continues functioning even during partial network compromise.
 
-Enable stealth communication to evade adversarial reconnaissance.
+Architecture Overview
 
-Provide affordable, scalable protection for MSMEs.
+A high-level text diagram of the StealthMesh system:
 
-Support real-time monitoring via a FastAPI dashboard backend.
+Mesh Core (mesh_core/)
 
-🧩 Core Architecture
-1. Mesh Core (mesh_core/)
-
-Implements the communication backbone of StealthMesh.
+Implements the decentralized communication backbone.
 
 Capabilities
 
@@ -25,55 +20,57 @@ End-to-end encrypted node-to-node communication
 
 Periodic key rotation
 
-Padding, timing jitter, and cover traffic to evade traffic analysis
+Traffic-analysis resistance via padding, jitter, and cover traffic
 
-Basic routing abstraction for direct or peer-assisted messaging
+Lightweight routing layer for direct or peer-assisted communication
 
-2. Defense Engine (defense_engine/)
+Defense Engine (defense_engine/)
 
-Runs on each node and provides autonomous threat detection & response.
+Runs autonomously on each node, providing distributed defense capabilities.
 
 Functions
 
-Local anomaly detection (rule-based + optional lightweight ML)
+Local anomaly detection (rule-based + optional ML classifiers)
 
-Distributed alert broadcasting to peers
+Distributed alert broadcasting
 
-Micro-containment actions (interface lockdown, process isolation, etc.)
+Micro-containment actions (interface throttling, process isolation, etc.)
 
-Deception routing leading attackers to decoy endpoints
+Deception routing to redirect adversaries toward decoy endpoints
 
-Network-wide coordinated defense signals
+Coordinated network-wide threat signaling
 
-3. Dashboard Backend (dashboard/backend/)
+Dashboard Backend (dashboard/backend/)
 
-A FastAPI service for visualization and remote control.
+FastAPI-based monitoring & orchestration layer.
 
 Features
 
-Live node status & heartbeat tracking
+Live node status and heartbeat tracking
 
-Alert feed & event history
+Real-time alert feed and event history
 
-Triggering of network-wide containment actions
+Trigger network-wide containment signals
 
-REST endpoints for simulations, node registration, and configuration
+REST endpoints for simulations, node registration, configuration
 
-4. Simulation Suite (simulations/)
+Future support: WebSocket push updates & interactive topology visualization
 
-A controlled environment to test resilience and behavior of the mesh.
+Simulation Suite (simulations/)
+
+A controlled sandbox for validating mesh performance and resilience.
 
 Includes
 
-Port scan scenarios
+Port-scan attack scenarios
 
-Brute-force attack simulations
+Brute-force simulation modules
 
-Lateral movement attempts
+Lateral movement attack emulation
 
-Stress tests for alert propagation & containment latency
+Stress tests for alert propagation delay & containment latency
 
-📁 Repository Structure
+Repository Structure
 StealthMesh/
 │
 ├── mesh_core/             # Stealth communication, routing, crypto logic
@@ -81,49 +78,40 @@ StealthMesh/
 ├── dashboard/
 │   └── backend/           # FastAPI service for monitoring & control
 ├── simulations/           # Attack scenarios & stress tests
-└── README.md              # You're here!
+└── README.md              # Project documentation
 
-🔐 Why StealthMesh?
+Why StealthMesh?
 
-Traditional SOC setups are expensive, centralized, and fragile.
-StealthMesh flips the model:
+Traditional SOC architectures are:
 
-No single point of failure
+Expensive
 
-Nodes defend themselves and their peers
+Centralized
 
-Adversaries struggle to observe communication patterns
+Vulnerable to single-point failures
 
-Works even in constrained environments
+StealthMesh flips the paradigm:
 
-A perfect fit for MSMEs seeking high resilience at low cost.
+No central point of failure
 
-🛠️ Tech Stack
+Nodes defend themselves and each other
+
+Stealth communication makes reconnaissance difficult
+
+Operates effectively even on constrained MSME hardware
+
+A modern, practical cybersecurity approach for organizations that need resilience without enterprise-grade budgets.
+
+Tech Stack
 
 Python 3.10+
 
-FastAPI for the dashboard
+FastAPI – dashboard backend
 
-AsyncIO / WebSockets for mesh communication
+AsyncIO + WebSockets – real-time mesh communication
 
-Cryptography for encryption & key rotation
+cryptography – encryption & key rotation
 
-Lightweight ML models (optional)
+Lightweight ML (optional) – anomaly classification
 
-Docker (optional) for deployment
-
-🚧 Current Status / Roadmap
-
- Stealth communication prototype
-
- Local anomaly detection
-
- Peer alerting
-
- Deception routing engines
-
- ML-based anomaly classifiers
-
- Full dashboard visualization
-
- Multi-node deployment scripts
+Docker (optional) – multi-node deployment
