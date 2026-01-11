@@ -398,6 +398,36 @@
         </div>
       </section>
 
+      <section class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <h2>
+            <span class="accent-dot"></span>
+            Simulation Control
+          </h2>
+        </div>
+
+        <div style ="display:flex; gap:8px; flex-wrap:wrap;">
+          <select id="attacker">
+            <option value="node-1">node-1</option>
+            <option value="node-2">node-2</option>
+          </select>
+
+          <select id="victim">
+            <option value="node-1">node-1</option>
+            <option value="node-2">node-2</option>
+          </select>
+
+          <select id="attackType">
+            <option value="FAILED_LOGIN_BURST">Failed Login Burst</option>
+            <option value="PORT_SCAN">Port Scan</option>
+          </select>
+
+          <button id="simulateAttackButton" class="refresh-btn">
+            Simulate Attack
+          </button>
+        </div>
+      </section>
+
       <!-- Right: alerts + actions -->
       <section class="card">
         <div class="card-header">
@@ -645,6 +675,28 @@
       alertsActionsContainer.appendChild(table);
     }
 
+    async function simulateAttack() {
+      const attacker = document.getElementById("attacker").value;
+      const victim = document.getElementById("victim").value;
+      const attackType = document.getElementById("attackType").value;
+
+      await fetch(`${API_BASE}/simulate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          attacker,
+          victim,
+          attack_type: attackType,
+          count: 20
+        })
+        
+      });
+
+      
+    }
+
     async function refreshAll() {
       try {
         const [nodes, alerts, actions] = await Promise.all([
@@ -673,6 +725,10 @@
     refreshAll();
     // Auto-refresh
     setInterval(refreshAll, REFRESH_INTERVAL_MS);
+    document.getElementById("simulateAttackButton").addEventListener("click", () => {
+      simulateAttack();
+    });
+
   </script>
 </body>
 </html>
