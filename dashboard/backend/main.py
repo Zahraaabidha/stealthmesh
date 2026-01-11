@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -50,6 +51,12 @@ class ActionOut(BaseModel):
     target: Optional[str] = None
     details: dict
 
+class SimulationIn(BaseModel):
+    attacker: str
+    victim: str
+    attack_type: Literal["FAILED_LOGIN_BURST", "PORT_SCAN"]
+    count: int = 10
+
 
 # ----------------- In-memory stores -----------------
 
@@ -61,6 +68,11 @@ ALERTS: List[AlertOut] = []
 
 # recent actions (append-only list)
 ACTIONS: List[ActionOut] = []
+
+# ----------------- Simulation control -----------------
+
+# pending simulation commands (pull-based control)
+SIMULATION_QUEUE: List[dict] = []
 
 
 # ----------------- FastAPI app -----------------
@@ -189,6 +201,36 @@ def ingest_event(event: EventIn):
     # STATUS events are already handled by _update_node_status_from_event
 
     return {"ok": True}
+
+@app.post("/simulate")
+def simulate_attack(req: SimulationIn):
+    """
+    Accepts a simulation request from the frontend.
+    Nodes will poll and pick this up.
+    """
+    if req.attacker == req.victim:
+        raise HTTPException(status_code=400, detail="Attacker and victim must differ")
+    SIMULATION_QUEUE.append({
+        "attacker": req.attacker,
+        "victim": req.victim,
+        "attack_type": req.attack_type,
+        "count": req.count,
+        "timestamp": _now_ts(),
+    })
+    return {"status": "queued"}
+
+@app.get("/control/{node_id}")
+def get_control_commands(node_id: str):
+    """
+    Nodes poll this endpoint to receive simulation commands.
+    """
+    cmds = [c for c in SIMULATION_QUEUE if c["attacker"] == node_id]
+
+    # remove delivered commands
+    for c in cmds:
+        SIMULATION_QUEUE.remove(c)
+
+    return cmds
 
 
 @app.get("/nodes", response_model=List[NodeStatus])
