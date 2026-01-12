@@ -545,6 +545,20 @@
         statusChip.appendChild(dot);
         statusChip.appendChild(label);
         badges.appendChild(statusChip);
+        // Reset button (manual operator action)
+        const resetBtn = document.createElement("button");
+        resetBtn.textContent = "Reset";
+        resetBtn.style.fontSize = "0.7rem";
+
+        resetBtn.onclick = async () => {
+            await fetch(`${API_BASE}/reset`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ node_id: node.node_id })
+            });
+            await refreshAll();
+          };
+        badges.appendChild(resetBtn);
 
         // you can add more chips later (role, region, etc.)
         wrapper.appendChild(main);

@@ -57,6 +57,9 @@ class SimulationIn(BaseModel):
     attack_type: Literal["FAILED_LOGIN_BURST", "PORT_SCAN"]
     count: int = 10
 
+class ResetIn(BaseModel):
+    node_id: str
+
 
 # ----------------- In-memory stores -----------------
 
@@ -218,6 +221,31 @@ def simulate_attack(req: SimulationIn):
         "timestamp": _now_ts(),
     })
     return {"status": "queued"}
+
+@app.post("/reset")
+def reset_node(req: ResetIn):
+    status = NODES.get(req.node_id)
+    if not status:
+        raise HTTPException(status_code=404, detail="Node not found")
+
+    # Reset state
+    status.state = "NORMAL"
+    status.last_seen = _now_ts()
+    NODES[req.node_id] = status
+
+    # Log action
+    ACTIONS.append(
+        ActionOut(
+            node_id=req.node_id,
+            timestamp=_now_ts(),
+            action="MANUAL_RESET",
+            target=req.node_id,
+            details={}
+        )
+    )
+
+    return {"status": "reset", "node": req.node_id}
+
 
 @app.get("/control/{node_id}")
 def get_control_commands(node_id: str):
